@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_navigation"
+    app:startDestination="@id/destination_home">
+
+    <fragment
+        android:id="@+id/destination_home"
+        android:name="com.redgunner.instagramzommy.views.fragments.HomeFragment"
+        android:label="home_fragment"
+        tools:layout="@layout/home_fragment" />
+    <fragment
+        android:id="@+id/destination_favorite"
+        android:name="com.redgunner.instagramzommy.views.fragments.FavoriteFragment"
+        android:label="favorite_fragment"
+        tools:layout="@layout/favorite_fragment" />
+    <fragment
+        android:id="@+id/destination_setting"
+        android:name="com.redgunner.instagramzommy.views.fragments.SettingsFragment"
+        android:label="settings_fragment"
+        tools:layout="@layout/settings_fragment" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.redgunner.instagramzommy.views.fragments.ProfileFragment"
+        android:label="profile_fragment"
+        tools:layout="@layout/profile_fragment" >
+        <argument
+            android:name="userName"
+            app:argType="string" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_profileFragment"
+        app:destination="@id/profileFragment"
+       />
+</navigation>

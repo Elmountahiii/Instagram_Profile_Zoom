@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_share_icon"
+        android:title="@string/share"
+        app:showAsAction="collapseActionView" />
+
+    <item
+        android:id="@+id/save"
+        android:icon="@drawable/ic_save_icon"
+        android:title="@string/save"
+        app:showAsAction="collapseActionView" />
+
+    <item
+        android:id="@+id/favorite"
+        android:icon="@drawable/ic_favorite_icon"
+        android:title="@string/favorite_menu"
+        app:showAsAction="collapseActionView" />
+
+
+
+
+
+</menu>

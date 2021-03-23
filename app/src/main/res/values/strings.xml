@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Instagram Profile Zoom</string>
+    <string name="home">Home</string>
+    <string name="favorite">Favorite</string>
+    <string name="favorite_menu">Add To Favorite</string>
+    <string name="setting">Settings</string>
+    <string name="search">search</string>
+    <string name="mainText">Search to find any Instagram profile and see his profile picture</string>
+    <string name="enable_dark_mode">Enable Dark Mode</string>
+    <string name="remove_ads">Remove Ads</string>
+    <string name="restore_purchase">Restore purchase</string>
+    <string name="share_this_app">Share This App</string>
+    <string name="your_favorite">Your Favorite :</string>
+    <string name="recent_search">Recent search :</string>
+    <string name="share">Share Photo</string>
+    <string name="save">Save To Device</string>
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
+    <string name="_320p">320p</string>
+    <string name="_1080p">1080p</string>
+    <string name="rate_this_app">Rate This App</string>
+</resources>

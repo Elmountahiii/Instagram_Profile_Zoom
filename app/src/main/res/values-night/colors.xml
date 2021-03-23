@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <color name="custom_input_color">#E8303030</color>
+    <color name="big_headlines_color">@color/white</color>
+    <color name="toll_Bar_Color">#252729</color>
+
+
+
+</resources>
