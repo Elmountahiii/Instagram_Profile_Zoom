@@ -30,12 +30,14 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
 ) :ViewModel() {
 
 
-    val isServerOn= MutableLiveData<Boolean>()
     val hasInternetConnection=MutableLiveData<Boolean>()
+     var visibility=false
+
 
     val accountsList=MutableLiveData<Response<SearchResponse>>()
 
     val instagramAccount = MutableLiveData<Response<AccountResponse>>()
+
 
     val shareItNotify=MutableLiveData<String>()
 
@@ -44,12 +46,10 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
 
 
 
-    fun loginWithTheServer(){
-        viewModelScope.launch {
-            isServerOn.value = instagramRepository.startServer().isSuccessful
 
-        }
-    }
+
+
+
 
 
     fun getAccount(userName: String) {

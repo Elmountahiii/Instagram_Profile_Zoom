@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
                 viewModel.hasInternetConnection.value = true
 
 
-                viewModel.loginWithTheServer()
             }
 
 
@@ -71,19 +70,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        viewModel.isServerOn.observe(this, { response ->
-
-            if (!response) {
-                Toast.makeText(
-                    this,
-                    "Sorry we have a problem please try again later",
-                    Toast.LENGTH_LONG
-                ).show()
-
-            }
-        })
-
 
         val navigationController = Navigation.findNavController(
             this,

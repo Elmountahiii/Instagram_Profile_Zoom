@@ -10,4 +10,5 @@
     <color name="custom_input_color">#EFEFEF</color>
     <color name="big_headlines_color">@color/black</color>
     <color name="toll_Bar_Color">#fafafa</color>
+    <color name="gray">#e2e2e2</color>
 </resources>

@@ -59,11 +59,11 @@ class SearchInstagramUserListAdapter(val accountClick:(account: UserX)->Unit) :
 
     class InstagramListComparator() : DiffUtil.ItemCallback<User>() {
         override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem.user.username == newItem.user.username
+            return false
         }
 
         override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem.user.username == newItem.user.username
+            return false
         }
 
 

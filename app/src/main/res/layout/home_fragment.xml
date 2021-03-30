@@ -49,6 +49,57 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/SearchTextField">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+                    <include layout="@layout/shimmer_search_item_layout" />
+
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <ImageView
                 android:id="@+id/MainImage"
                 android:layout_width="wrap_content"
@@ -84,7 +135,7 @@
                 android:layout_height="0dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
@@ -96,6 +147,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/SearchTextField"
                 tools:listitem="@layout/search_item_layout" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

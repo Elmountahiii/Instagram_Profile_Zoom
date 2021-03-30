@@ -1,7 +1,6 @@
 package com.redgunner.instagramzommy.repository
 
 import com.redgunner.instagramzommy.database.dao.InstagramDao
-import com.redgunner.instagramzommy.models.login.LoginResponse
 import com.redgunner.instagramzommy.models.profile.AccountResponse
 import com.redgunner.instagramzommy.models.search.SearchResponse
 import com.redgunner.instagramzommy.models.search.UserX
@@ -37,7 +36,4 @@ class InstagramRepository @Inject constructor(private val instagramDao: Instagra
 
     }
 
-    suspend fun startServer():Response<LoginResponse>{
-        return RetrofitInstance.searchAPI.startServer()
-    }
 }

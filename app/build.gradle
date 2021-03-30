@@ -88,6 +88,10 @@ dependencies {
     //DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0-alpha01"
 
+    //Facebook Shimmer
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
+
     //ZoomHelper
     implementation 'com.aghajari.zoomhelper:ZoomHelper:1.0.2'
 

@@ -1,6 +1,5 @@
 package com.redgunner.instagramzommy.network.api
 
-import com.redgunner.instagramzommy.models.login.LoginResponse
 import com.redgunner.instagramzommy.models.profile.AccountResponse
 import com.redgunner.instagramzommy.models.search.SearchResponse
 import retrofit2.Response
@@ -16,7 +15,4 @@ interface InstagramSearchApi {
 
     @GET("account/{userName}")
     suspend fun getAccountProfile(@Path("userName") userName:String ):Response<AccountResponse>
-
-    @GET("login")
-    suspend fun startServer():Response<LoginResponse>
 }
