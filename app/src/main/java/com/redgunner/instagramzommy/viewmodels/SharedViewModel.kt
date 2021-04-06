@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,78 +17,75 @@ import com.redgunner.instagramzommy.models.search.SearchResponse
 import com.redgunner.instagramzommy.models.search.UserX
 import com.redgunner.instagramzommy.repository.InstagramRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-class SharedViewModel@ViewModelInject constructor(private val instagramRepository: InstagramRepository,
-                                                  @ApplicationContext application: Context
-) :ViewModel() {
+class SharedViewModel @ViewModelInject constructor(
+    private val instagramRepository: InstagramRepository,
+    @ApplicationContext application: Context
+) : ViewModel() {
 
 
-    val hasInternetConnection=MutableLiveData<Boolean>()
-     var visibility=false
+    val hasInternetConnection = MutableLiveData<Boolean>()
+
+    var visibility = false
+
+    val accountsList = MutableLiveData<Response<SearchResponse>>()
+
+    private val accountResponse = MutableLiveData<Response<AccountResponse>>()
+
+    private val accountEventChannel = Channel<Response<AccountResponse>>()
+    val instagramAccountFlow = accountEventChannel.receiveAsFlow()
 
 
-    val accountsList=MutableLiveData<Response<SearchResponse>>()
-
-    val instagramAccount = MutableLiveData<Response<AccountResponse>>()
-
-
-    val shareItNotify=MutableLiveData<String>()
+    private val shareImageEventChannel = Channel<String>()
+    val shareItNotify = shareImageEventChannel.receiveAsFlow()
 
     private val context = application.applicationContext
 
 
-
-
-
-
-
-
-
-
     fun getAccount(userName: String) {
         viewModelScope.launch {
-            instagramAccount.value = instagramRepository.getInstagramAccount(userName)
+
+
+            async {
+                accountResponse.value = instagramRepository.getInstagramAccount(userName)
+                accountEventChannel.send(accountResponse.value!!)
+            }
+
+
         }
     }
-
-    fun addAccountToFavorite(account: UserX) {
-
-
-        viewModelScope.launch {
-            instagramRepository.addAccount(account)
-        }
-
-    }
-
 
     fun saveImage() {
 
         CoroutineScope(Dispatchers.IO).launch {
-            if ( instagramAccount.value?.isSuccessful == true){
-                saveImage( Glide
-                    .with(context)
-                    .asBitmap()
-                    .load(instagramAccount.value?.body()?.profile_pic_url_hd).submit().get())
+            if(accountResponse.value?.body()!=null){
+                saveImage(
+                    Glide
+                        .with(context)
+                        .asBitmap()
+                        .load(accountResponse.value!!.body()!!.profile_pic_url_hd).submit().get()
+                )
             }
+
+
 
         }
 
     }
 
-    private  fun saveImage(image: Bitmap){
+    private fun saveImage(image: Bitmap) {
         var savedImagePath: String? = null
         val imageFileName = "JPEG_" + "${System.currentTimeMillis()}" + ".jpg"
         val storageDir = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                .toString() + "/${R.string.app_name}"
+                .toString() + "/Instagram profile pictures"
         )
         var success = true
         if (!storageDir.exists()) {
@@ -95,7 +93,7 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
         }
         if (success) {
             val imageFile = File(storageDir, imageFileName)
-            savedImagePath = imageFile.getAbsolutePath()
+            savedImagePath = imageFile.absolutePath
 
             try {
                 val fOut: OutputStream = FileOutputStream(imageFile)
@@ -105,19 +103,19 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
                 e.printStackTrace()
             }
 
-            // Add the image to the system gallery
             galleryAddPic(savedImagePath)
-            //Toast.makeText(this, "IMAGE SAVED", Toast.LENGTH_LONG).show() // to make this working, need to manage coroutine, as this execution is something off the main thread
+
         }
 
     }
 
-    private suspend fun saveImageAndShareIt(image: Bitmap){
+
+    private suspend fun saveImageAndShareIt(image: Bitmap) {
         var savedImagePath: String? = null
         val imageFileName = "JPEG_" + "${System.currentTimeMillis()}" + ".jpg"
         val storageDir = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                .toString() + "/Insta Profile Zoom"
+                .toString() + "/Instagram profile pictures"
         )
         var success = true
         if (!storageDir.exists()) {
@@ -125,7 +123,9 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
         }
         if (success) {
             val imageFile = File(storageDir, imageFileName)
-            savedImagePath = imageFile.getAbsolutePath()
+            savedImagePath = imageFile.absolutePath
+            shareImageEventChannel.send(savedImagePath)
+
 
             try {
                 val fOut: OutputStream = FileOutputStream(imageFile)
@@ -135,21 +135,13 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
                 e.printStackTrace()
             }
 
-            // Add the image to the system gallery
             galleryAddPic(savedImagePath)
-            //Toast.makeText(this, "IMAGE SAVED", Toast.LENGTH_LONG).show() // to make this working, need to manage coroutine, as this execution is something off the main thread
-        }
-        if (savedImagePath != null) {
-            withContext(Dispatchers.Main){
-                shareItNotify.value= savedImagePath!!
 
-            }
         }
 
     }
 
-
-    private  fun galleryAddPic(imagePath: String?) {
+    private fun galleryAddPic(imagePath: String?) {
         imagePath?.let { path ->
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
             val f = File(path)
@@ -160,40 +152,64 @@ class SharedViewModel@ViewModelInject constructor(private val instagramRepositor
         }
     }
 
-    fun downloadAndShareIt(){
+    fun downloadAndShareIt() {
+
 
         CoroutineScope(Dispatchers.IO).launch {
-            if (instagramAccount.value?.isSuccessful == true){
+            if(accountResponse.value?.body()!=null){
+
                 saveImageAndShareIt(
                     Glide
                         .with(context)
                         .asBitmap()
-                        .load(instagramAccount.value?.body()?.profile_pic_url_hd).submit().get())
+                        .load(accountResponse.value?.body()?.profile_pic_url_hd).submit().get()
+                )
             }
 
-
         }
 
     }
 
-    fun search(userName:String){
+    fun search(userName: String) {
 
         viewModelScope.launch {
-            accountsList.value=instagramRepository.search(userName)
+            accountsList.value = instagramRepository.search(userName)
         }
     }
 
 
-    fun addAccount(account: UserX) {
+    fun addAccountToFavorite() {
+
+        viewModelScope.launch {
+            val account = accountResponse.value?.body()
+            if (account != null) {
+                instagramRepository.addAccount(
+                    UserX(
+                        full_name = account.full_name,
+                        has_anonymous_profile_picture = false,
+                        is_private = account.is_private,
+                        is_verified = account.is_verified,
+                        profile_pic_url = account.profile_pic_url,
+                        username = account.username,
+                        is_favorite = true
+
+
+                    )
+                )
+
+            }
+        }
+
+    }
+
+
+    fun addAccountToHistory(account: UserX) {
 
         viewModelScope.launch {
             instagramRepository.addAccount(account)
         }
 
     }
-
-
-
 
 
 }

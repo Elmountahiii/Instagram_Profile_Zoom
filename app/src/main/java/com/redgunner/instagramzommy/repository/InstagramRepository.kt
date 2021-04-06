@@ -4,14 +4,13 @@ import com.redgunner.instagramzommy.database.dao.InstagramDao
 import com.redgunner.instagramzommy.models.profile.AccountResponse
 import com.redgunner.instagramzommy.models.search.SearchResponse
 import com.redgunner.instagramzommy.models.search.UserX
-
-import com.redgunner.instagramzommy.network.retrofit.RetrofitInstance
+import com.redgunner.instagramzommy.network.api.InstagramSearchApi
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class InstagramRepository @Inject constructor(private val instagramDao: InstagramDao) {
+class InstagramRepository @Inject constructor(private val instagramDao: InstagramDao,private val instagramSearchApi: InstagramSearchApi) {
 
 
     val favoriteAccountList=instagramDao.getFavoriteAccounts()
@@ -23,7 +22,7 @@ class InstagramRepository @Inject constructor(private val instagramDao: Instagra
     suspend fun search(userName: String): Response<SearchResponse> {
 
 
-        return RetrofitInstance.searchAPI.getSearchAccounts(userName)
+        return instagramSearchApi.getSearchAccounts(userName)
     }
 
     suspend fun addAccount(account: UserX){
@@ -32,7 +31,7 @@ class InstagramRepository @Inject constructor(private val instagramDao: Instagra
 
 
     suspend fun getInstagramAccount(userName: String):Response<AccountResponse>{
-        return RetrofitInstance.searchAPI.getAccountProfile(userName)
+        return instagramSearchApi.getAccountProfile(userName)
 
     }
 

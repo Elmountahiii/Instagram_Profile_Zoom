@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 
 import android.os.Bundle
+import android.util.Log
 
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -27,6 +29,9 @@ import com.redgunner.instagramzommy.viewmodels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.profile_fragment.*
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -36,14 +41,9 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
     private val saveArgs: ProfileFragmentArgs by navArgs()
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    private lateinit var mInterstitialAd: InterstitialAd
-
-
 
     override fun onStart() {
         super.onStart()
-
-
         if(viewModel.hasInternetConnection.value==true){
 
             viewModel.getAccount(saveArgs.userName)
@@ -54,78 +54,56 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
         }
 
-        viewModel.instagramAccount.observe(viewLifecycleOwner, { response ->
-
-            if (response.isSuccessful) {
-
-                val instagramUser = response.body()
-                displayItems()
-
-                displayAccount(instagramUser!!)
-
-
-            } else {
-                Toast.makeText(this.context, "Error please try again later", Toast.LENGTH_LONG)
-                    .show()
-
-            }
-
-        })
-
-        viewModel.shareItNotify.observe(viewLifecycleOwner,{imagePath ->
-            if (imagePath.isNotEmpty()){
-                openChooser(imagePath)
-               viewModel.shareItNotify.value=""
-            }
-        })
-        viewModel.instagramAccount.value?.body()?.let { displayAccount(it) }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setPermissionCallback()
-        MobileAds.initialize(this.context) {
-
-        }
-        mInterstitialAd = InterstitialAd(this.context)
-        mInterstitialAd.adUnitId = "YOUR AD UNIT ID"
-        mInterstitialAd.loadAd(AdRequest.Builder().build())
-
 
     }
-
 
     override fun onResume() {
         super.onResume()
 
+        lifecycleScope.launchWhenStarted {
+
+            viewModel.instagramAccountFlow.collect { response ->
+
+                if (response.isSuccessful){
+                    displayItems()
+                    response.body()?.let { displayAccount(it) }
+
+                }
+
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.shareItNotify.collect {imagePath ->
+
+                openChooser(imagePath)
+
+
+
+
+            }
+        }
+
+
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.favorite -> {
-                    viewModel.instagramAccount.value?.body()?.let { addToFavorite(it) }
+                 viewModel.addAccountToFavorite()
                     true
                 }
                 R.id.save -> {
-
-                    if (mInterstitialAd.isLoaded) {
-                        mInterstitialAd.show()
                         checkPermissionAndDownloadBitmap()
-
-                    } else {
-                        checkPermissionAndDownloadBitmap()
-
-                    }
-
-
-
 
                     true
                 }
                 R.id.share -> {
 
-
-
-                  viewModel.downloadAndShareIt()
+                 viewModel.downloadAndShareIt()
 
                     true
                 }
@@ -139,20 +117,19 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
     }
 
-    override fun onStop() {
-        super.onStop()
-        unDisplayItems()
-
-    }
-
-
-    private fun openChooser(imagePath:String){
-        val shareIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, Uri.parse(imagePath))
-            type = "image/jpeg"
+    private fun openChooser(imagePath:String?){
+        if (imagePath != null) {
+            val shareIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, Uri.parse(imagePath))
+                type = "image/jpeg"
+            }
+            startActivity(Intent.createChooser(shareIntent, "Send To"))
+            }else{
+                Toast.makeText(this.context,"Error",Toast.LENGTH_LONG).show()
         }
-        startActivity(Intent.createChooser(shareIntent, "Send To"))
+
+
     }
 
     private fun displayAccount(account: AccountResponse) {
@@ -172,18 +149,8 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             .apply(bitmapTransform(BlurTransformation(25, 3))).into(profile_image_1080)
 
         profile_image_1080.setOnClickListener {
-            if (mInterstitialAd.isLoaded) {
-                mInterstitialAd.show()
-                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
-                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
-
-            }else{
-                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
-                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
-
-            }
-
-
+            Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
+            Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
 
         }
 
@@ -195,24 +162,14 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
     }
 
-    private fun addToFavorite(user: AccountResponse) {
-        viewModel.addAccountToFavorite(
-            UserX(
-                user.full_name, false, user.is_private, user.is_verified, user.profile_pic_url,
-                user.username,
-                true
-            )
-        )
-    }
-
     private fun checkPermissionAndDownloadBitmap() {
         when {
             ContextCompat.checkSelfPermission(
                 this.requireContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED -> {
+                viewModel.saveImage()
 
-                saveImageToDevice()
             }
 
             shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
@@ -231,25 +188,16 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
         }
     }
 
-
     private fun setPermissionCallback() {
         requestPermissionLauncher =
             registerForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    saveImageToDevice()
+                    viewModel.saveImage()
+
                 }
             }
-    }
-
-
-    private fun saveImageToDevice() {
-
-
-        viewModel.saveImage()
-
-
     }
 
     private fun displayItems(){
@@ -260,17 +208,5 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
         progressBar.visibility=View.INVISIBLE
 
     }
-
-    private fun unDisplayItems(){
-        textCounter1.visibility=View.INVISIBLE
-        textCounter2.visibility=View.INVISIBLE
-        textCounter3.visibility=View.INVISIBLE
-        textCounter4.visibility=View.INVISIBLE
-        progressBar.visibility=View.VISIBLE
-
-    }
-
-
-
 
 }

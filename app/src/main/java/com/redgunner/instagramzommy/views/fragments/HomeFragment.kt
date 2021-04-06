@@ -2,7 +2,6 @@ package com.redgunner.instagramzommy.views.fragments
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -22,7 +21,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
     private val viewModel: SharedViewModel by activityViewModels()
 
     private val accountListAdapter = SearchInstagramUserListAdapter { account ->
-        viewModel.addAccount(account)
+        viewModel.addAccountToHistory(account)
 
         findNavController().navigate(HomeFragmentDirections.actionGlobalProfileFragment(account.username))
 
@@ -39,7 +38,6 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
 
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -98,6 +96,11 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.visibility=false
+
+    }
 
     private fun setUpRecyclerView() {
         HomeAccountsList.apply {
