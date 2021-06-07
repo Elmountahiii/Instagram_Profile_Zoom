@@ -7,7 +7,7 @@ class Constants {
 
     companion object{
 
-       const  val myServerURL= "YOUR SERVER URL"
+        const  val myServerURL= "YOUR SERVER URL"
 
         val theme_Key= preferencesKey<Boolean>("Theme_Key")
 

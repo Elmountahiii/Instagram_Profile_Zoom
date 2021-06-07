@@ -10,7 +10,6 @@ import androidx.lifecycle.asLiveData
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
-import com.aghajari.zoomhelper.ZoomHelper
 import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.utils.ConnectionLiveData
 import com.redgunner.instagramzommy.utils.UserPreferences
@@ -89,7 +88,4 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        return ZoomHelper.getInstance().dispatchTouchEvent(ev!!,this) || super.dispatchTouchEvent(ev)
-    }
 }

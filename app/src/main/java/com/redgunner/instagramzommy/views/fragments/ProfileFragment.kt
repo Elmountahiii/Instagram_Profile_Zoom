@@ -4,11 +4,9 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-
 import android.os.Bundle
-import android.util.Log
-
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,18 +18,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions.bitmapTransform
-import com.google.android.gms.ads.*
 import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.models.profile.AccountResponse
-import com.redgunner.instagramzommy.models.search.UserX
 import com.redgunner.instagramzommy.utils.showPermissionRequestDialog
 import com.redgunner.instagramzommy.viewmodels.SharedViewModel
+import com.stfalcon.imageviewer.StfalconImageViewer
 import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.profile_fragment.*
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -39,18 +34,19 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
     private val viewModel: SharedViewModel by activityViewModels()
     private val saveArgs: ProfileFragmentArgs by navArgs()
+    private val profileImageList = mutableListOf<String>()
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     override fun onStart() {
         super.onStart()
-        if(viewModel.hasInternetConnection.value==true){
+        if (viewModel.hasInternetConnection.value == true) {
 
             viewModel.getAccount(saveArgs.userName)
 
 
-        }else{
-            Toast.makeText(this.context,"No internet connection",Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this.context, "No internet connection", Toast.LENGTH_LONG).show()
 
         }
 
@@ -69,7 +65,7 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
             viewModel.instagramAccountFlow.collect { response ->
 
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     displayItems()
                     response.body()?.let { displayAccount(it) }
 
@@ -79,11 +75,9 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
         }
 
         lifecycleScope.launchWhenStarted {
-            viewModel.shareItNotify.collect {imagePath ->
+            viewModel.shareItNotify.collect { imagePath ->
 
                 openChooser(imagePath)
-
-
 
 
             }
@@ -93,17 +87,17 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.favorite -> {
-                 viewModel.addAccountToFavorite()
+                    viewModel.addAccountToFavorite()
                     true
                 }
                 R.id.save -> {
-                        checkPermissionAndDownloadBitmap()
+                    checkPermissionAndDownloadBitmap()
 
                     true
                 }
                 R.id.share -> {
 
-                 viewModel.downloadAndShareIt()
+                    viewModel.downloadAndShareIt()
 
                     true
                 }
@@ -115,9 +109,17 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             findNavController().popBackStack()
         }
 
+        profile_image.setOnClickListener {
+
+            StfalconImageViewer.Builder<String>(context,profileImageList){ imageView: ImageView, url: String ->
+                Glide.with(this).load(url).into(imageView)
+
+            }.show()
+        }
+
     }
 
-    private fun openChooser(imagePath:String?){
+    private fun openChooser(imagePath: String?) {
         if (imagePath != null) {
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
@@ -125,14 +127,16 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
                 type = "image/jpeg"
             }
             startActivity(Intent.createChooser(shareIntent, "Send To"))
-            }else{
-                Toast.makeText(this.context,"Error",Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this.context, "Error", Toast.LENGTH_LONG).show()
         }
 
 
     }
 
     private fun displayAccount(account: AccountResponse) {
+
+        profileImageList.add(account.profile_pic_url)
 
         followersCount.text = account.edge_followed_by.count.toString()
         followingCount.text = account.edge_follow.count.toString()
@@ -151,6 +155,9 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
         profile_image_1080.setOnClickListener {
             Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
             Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
+            profileImageList.removeAt(0)
+            profileImageList.add(account.profile_pic_url_hd)
+
 
         }
 
@@ -200,12 +207,12 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             }
     }
 
-    private fun displayItems(){
-        textCounter1.visibility=View.VISIBLE
-        textCounter2.visibility=View.VISIBLE
-        textCounter3.visibility=View.VISIBLE
-        textCounter4.visibility=View.VISIBLE
-        progressBar.visibility=View.INVISIBLE
+    private fun displayItems() {
+        textCounter1.visibility = View.VISIBLE
+        textCounter2.visibility = View.VISIBLE
+        textCounter3.visibility = View.VISIBLE
+        textCounter4.visibility = View.VISIBLE
+        progressBar.visibility = View.INVISIBLE
 
     }
 
