@@ -1,11 +1,15 @@
 package com.redgunner.instagramzommy.di
 
+import android.app.Application
+import android.content.Context
+import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.network.api.InstagramSearchApi
 import com.redgunner.instagramzommy.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -19,6 +23,11 @@ object AppModule {
 
 
 
+
+    @Provides
+    @Singleton
+    fun provideServerURL(@ApplicationContext context: Context)=context.getString(R.string.ServerUrl)
+
     @Provides
     @Singleton
     fun  provideOkHttpClient():OkHttpClient=
@@ -31,8 +40,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit=
-        Retrofit.Builder().baseUrl(Constants.myServerURL)
+    fun provideRetrofit(okHttpClient: OkHttpClient,serverUrl :String): Retrofit=
+        Retrofit.Builder().baseUrl(serverUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient )
             .build()

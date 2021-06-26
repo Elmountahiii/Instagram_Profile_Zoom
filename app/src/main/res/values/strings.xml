@@ -1,4 +1,17 @@
 <resources>
+
+
+    <!--Important -->
+    <string name="ServerUrl"> Add Yur Server Url</string>
+    <!--Important -->
+
+
+    <!--Important -->
+    <string name="InterstitialAdID"> Add Your Interstitial Ad ID </string>
+    <!--Important -->
+
+
+
     <string name="app_name">Instagram Profile Zoom</string>
     <string name="home">Home</string>
     <string name="favorite">Favorite</string>

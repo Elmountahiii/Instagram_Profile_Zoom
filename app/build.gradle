@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId "com.redgunner.instagramzommy"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -94,7 +94,11 @@ dependencies {
 
     //image Full Size
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.1'
-    
+
+    //google Ads
+    implementation 'com.google.android.gms:play-services-ads:19.8.0'
+
+
 
 
     //hilt

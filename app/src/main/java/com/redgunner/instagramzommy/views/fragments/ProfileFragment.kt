@@ -18,6 +18,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions.bitmapTransform
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.models.profile.AccountResponse
 import com.redgunner.instagramzommy.utils.showPermissionRequestDialog
@@ -36,6 +38,9 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
     private val saveArgs: ProfileFragmentArgs by navArgs()
     private val profileImageList = mutableListOf<String>()
 
+    private lateinit var mInterstitialAd: com.google.android.gms.ads.InterstitialAd
+
+
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     override fun onStart() {
@@ -49,6 +54,9 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             Toast.makeText(this.context, "No internet connection", Toast.LENGTH_LONG).show()
 
         }
+
+        setUpInterstitialAd()
+
 
     }
 
@@ -119,6 +127,16 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
     }
 
+    private fun setUpInterstitialAd() {
+        mInterstitialAd = com.google.android.gms.ads.InterstitialAd(this.context)
+
+        mInterstitialAd.adUnitId = getString(R.string.InterstitialAdID)
+        mInterstitialAd.loadAd(AdRequest.Builder().build())
+
+    }
+
+
+
     private fun openChooser(imagePath: String?) {
         if (imagePath != null) {
             val shareIntent: Intent = Intent().apply {
@@ -153,10 +171,20 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             .apply(bitmapTransform(BlurTransformation(25, 3))).into(profile_image_1080)
 
         profile_image_1080.setOnClickListener {
-            Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
-            Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
-            profileImageList.removeAt(0)
-            profileImageList.add(account.profile_pic_url_hd)
+
+            if(mInterstitialAd.isLoaded){
+                mInterstitialAd.show()
+                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
+                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
+                profileImageList.removeAt(0)
+                profileImageList.add(account.profile_pic_url_hd)
+            }else{
+                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image)
+                Glide.with(this).load(account.profile_pic_url_hd).into(profile_image_1080)
+                profileImageList.removeAt(0)
+                profileImageList.add(account.profile_pic_url_hd)
+            }
+
 
 
         }

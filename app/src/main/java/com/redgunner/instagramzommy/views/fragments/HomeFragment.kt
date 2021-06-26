@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.adapter.SearchInstagramUserListAdapter
-
 import com.redgunner.instagramzommy.viewmodels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.home_fragment.*
@@ -50,45 +49,41 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
 
-
             }
 
             override fun afterTextChanged(s: Editable?) {
 
-                if (viewModel.hasInternetConnection.value==true)
-                {
+                if (viewModel.hasInternetConnection.value == true) {
                     if (s.toString().isEmpty()) {
                         MainImage.visibility = View.VISIBLE
                         MainText.visibility = View.VISIBLE
                         HomeAccountsList.visibility = View.INVISIBLE
-                        shimmer_view_container.visibility=View.INVISIBLE
-                        viewModel.visibility=false
-
+                        shimmer_view_container.visibility = View.INVISIBLE
+                        viewModel.visibility = false
 
 
                     } else {
                         MainImage.visibility = View.INVISIBLE
                         MainText.visibility = View.INVISIBLE
-                        shimmer_view_container.visibility=View.VISIBLE
+                        shimmer_view_container.visibility = View.VISIBLE
                         HomeAccountsList.visibility = View.INVISIBLE
                         shimmer_view_container.startShimmer()
                         viewModel.search(s.toString())
-                        viewModel.visibility=true
+                        viewModel.visibility = true
 
 
                     }
-                }
-                else{
-                    Toast.makeText(this@HomeFragment.context,"No internet connection",Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(
+                        this@HomeFragment.context,
+                        "No internet connection",
+                        Toast.LENGTH_LONG
+                    ).show()
                     MainImage.visibility = View.VISIBLE
                     MainText.visibility = View.VISIBLE
                     HomeAccountsList.visibility = View.INVISIBLE
 
                 }
-
-
-
-
 
 
             }
@@ -98,7 +93,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
     override fun onStop() {
         super.onStop()
-        viewModel.visibility=false
+        viewModel.visibility = false
 
     }
 
@@ -108,17 +103,17 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         }
     }
 
-    private fun setUpObservers(){
+    private fun setUpObservers() {
 
         viewModel.accountsList.observe(viewLifecycleOwner, { response ->
 
 
-            if (viewModel.visibility){
+            if (viewModel.visibility) {
                 shimmer_view_container.stopShimmer()
-                shimmer_view_container.visibility=View.INVISIBLE
+                shimmer_view_container.visibility = View.INVISIBLE
                 HomeAccountsList.visibility = View.VISIBLE
 
-            }else{
+            } else {
                 HomeAccountsList.visibility = View.INVISIBLE
 
             }
@@ -127,14 +122,18 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
             if (response.isSuccessful) {
                 val instagramResult = response.body()
 
-                if(instagramResult!!.users.isNotEmpty()){
+                if (instagramResult!!.users.isNotEmpty()) {
 
                     accountListAdapter.submitList(instagramResult.users)
 
                 }
 
             } else {
-                Toast.makeText(this.requireContext(), "Server Error ${response.code().toString()}", Toast.LENGTH_LONG)
+                Toast.makeText(
+                    this.requireContext(),
+                    "Server Error ${response.code().toString()}",
+                    Toast.LENGTH_LONG
+                )
                     .show()
 
             }
@@ -142,7 +141,6 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         })
 
     }
-
 
 
 }

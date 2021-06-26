@@ -10,6 +10,7 @@ import androidx.lifecycle.asLiveData
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
+import com.google.android.gms.ads.MobileAds
 import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.utils.ConnectionLiveData
 import com.redgunner.instagramzommy.utils.UserPreferences
@@ -30,6 +31,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        setUpMobileAds()
+
 
         connectionLiveData = ConnectionLiveData(this)
 
@@ -86,6 +90,14 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun setUpMobileAds() {
+        MobileAds.initialize(this)
+
+
+    }
+
+
 
 
 }
