@@ -2,12 +2,14 @@
 
 
     <!--Important -->
-    <string name="ServerUrl">Add Yur Server Url</string>
+    <string name="ServerUrl">add your server url</string>
     <!--Important -->
 
 
     <!--Important -->
     <string name="InterstitialAdID">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="exitInterstitialAdID">ca-app-pub-3940256099942544/1033173712</string>
+
     <!--Important -->
 
 
