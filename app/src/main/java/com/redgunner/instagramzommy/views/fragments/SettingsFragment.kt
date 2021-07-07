@@ -6,10 +6,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.redgunner.instagramzommy.R
 import com.redgunner.instagramzommy.utils.UserPreferences
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.profile_fragment.*
 import kotlinx.android.synthetic.main.settings_fragment.*
+import kotlinx.android.synthetic.main.settings_fragment.adView
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +27,8 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
 
     override fun onStart() {
         super.onStart()
+
+        setUpMobileAds()
         userPreferences.themePreferences.asLiveData().observe(viewLifecycleOwner, { isDark ->
             if (isDark != null) {
                 DrakSwitch.isChecked = isDark
@@ -100,6 +106,12 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
     private fun rateThisApp() {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${requireContext().packageName}")))
 
+    }
+
+    private fun setUpMobileAds() {
+        MobileAds.initialize(requireActivity())
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
 

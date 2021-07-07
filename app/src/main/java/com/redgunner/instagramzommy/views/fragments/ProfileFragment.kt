@@ -27,7 +27,9 @@ import com.redgunner.instagramzommy.viewmodels.SharedViewModel
 import com.stfalcon.imageviewer.StfalconImageViewer
 import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.glide.transformations.BlurTransformation
+import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.profile_fragment.*
+import kotlinx.android.synthetic.main.profile_fragment.adView
 import kotlinx.coroutines.flow.collect
 
 
@@ -57,7 +59,15 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
         setUpInterstitialAd()
 
+        setUpMobileAds()
 
+
+    }
+
+    private fun setUpMobileAds() {
+        MobileAds.initialize(requireActivity())
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
