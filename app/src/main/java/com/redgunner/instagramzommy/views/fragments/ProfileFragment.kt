@@ -47,15 +47,9 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
     override fun onStart() {
         super.onStart()
-        if (viewModel.hasInternetConnection.value == true) {
-
-            viewModel.getAccount(saveArgs.userName)
 
 
-        } else {
-            Toast.makeText(this.context, "No internet connection", Toast.LENGTH_LONG).show()
-
-        }
+        viewModel.getAccount(saveArgs.userName)
 
         setUpInterstitialAd()
 

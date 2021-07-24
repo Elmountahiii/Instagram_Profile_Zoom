@@ -67,35 +67,24 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
             override fun afterTextChanged(s: Editable?) {
 
-                if (viewModel.hasInternetConnection.value == true) {
-                    if (s.toString().isEmpty()) {
-                        MainImage.visibility = View.VISIBLE
-                        MainText.visibility = View.VISIBLE
-                        HomeAccountsList.visibility = View.INVISIBLE
-                        shimmer_view_container.visibility = View.INVISIBLE
-                        viewModel.visibility = false
 
-
-                    } else {
-                        MainImage.visibility = View.INVISIBLE
-                        MainText.visibility = View.INVISIBLE
-                        shimmer_view_container.visibility = View.VISIBLE
-                        HomeAccountsList.visibility = View.INVISIBLE
-                        shimmer_view_container.startShimmer()
-                        viewModel.search(s.toString())
-                        viewModel.visibility = true
-
-
-                    }
-                } else {
-                    Toast.makeText(
-                        this@HomeFragment.context,
-                        "No internet connection",
-                        Toast.LENGTH_LONG
-                    ).show()
+                if (s.toString().isEmpty()) {
                     MainImage.visibility = View.VISIBLE
                     MainText.visibility = View.VISIBLE
                     HomeAccountsList.visibility = View.INVISIBLE
+                    shimmer_view_container.visibility = View.INVISIBLE
+                    viewModel.visibility = false
+
+
+                } else {
+                    MainImage.visibility = View.INVISIBLE
+                    MainText.visibility = View.INVISIBLE
+                    shimmer_view_container.visibility = View.VISIBLE
+                    HomeAccountsList.visibility = View.INVISIBLE
+                    shimmer_view_container.startShimmer()
+                    viewModel.search(s.toString())
+                    viewModel.visibility = true
+
 
                 }
 

@@ -31,8 +31,6 @@ class SharedViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
 
-    val hasInternetConnection = MutableLiveData<Boolean>()
-
     var visibility = false
 
     val accountsList = MutableLiveData<Response<SearchResponse>>()
@@ -54,8 +52,14 @@ class SharedViewModel @ViewModelInject constructor(
 
 
             async {
-                accountResponse.value = instagramRepository.getInstagramAccount(userName)
-                accountEventChannel.send(accountResponse.value!!)
+
+                try{
+                    accountResponse.value = instagramRepository.getInstagramAccount(userName)
+                    accountEventChannel.send(accountResponse.value!!)
+                }catch (e:Exception){
+
+                }
+
             }
 
 
@@ -173,7 +177,13 @@ class SharedViewModel @ViewModelInject constructor(
     fun search(userName: String) {
 
         viewModelScope.launch {
-            accountsList.value = instagramRepository.search(userName)
+
+            try{
+                accountsList.value = instagramRepository.search(userName)
+
+            }catch (e :Exception){
+
+            }
         }
     }
 

@@ -12,7 +12,6 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.ads.MobileAds
 import com.redgunner.instagramzommy.R
-import com.redgunner.instagramzommy.utils.ConnectionLiveData
 import com.redgunner.instagramzommy.utils.UserPreferences
 import com.redgunner.instagramzommy.viewmodels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
 
     private val viewModel: SharedViewModel by viewModels()
-    lateinit var connectionLiveData: ConnectionLiveData
 
 
     override fun onStart() {
@@ -35,24 +33,6 @@ class MainActivity : AppCompatActivity() {
         setUpMobileAds()
 
 
-        connectionLiveData = ConnectionLiveData(this)
-
-        connectionLiveData.observe(this, { isNetworkAvailable ->
-
-            if (!isNetworkAvailable) {
-
-                Toast.makeText(this, "Please check your internet connection", Toast.LENGTH_LONG)
-                    .show()
-                viewModel.hasInternetConnection.value = false
-
-            } else {
-                viewModel.hasInternetConnection.value = true
-
-
-            }
-
-
-        })
 
 
         userPreferences.themePreferences.asLiveData().observe(this, { isDarak ->
